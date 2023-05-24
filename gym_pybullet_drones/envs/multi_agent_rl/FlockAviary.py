@@ -5,6 +5,10 @@ from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType
 from gym_pybullet_drones.envs.multi_agent_rl.BaseMultiagentAviary import BaseMultiagentAviary
 
+from wandb import init, log, join
+
+import wandb
+
 class FlockAviary(BaseMultiagentAviary):
     """Multi-agent RL problem: flocking."""
 
@@ -20,7 +24,7 @@ class FlockAviary(BaseMultiagentAviary):
                  freq: int=240,
                  aggregate_phy_steps: int=1,
                  gui=False,
-                 record=False, 
+                 record=False,
                  obs: ObservationType=ObservationType.KIN,
                  act: ActionType=ActionType.RPM):
         """Initialization of a multi-agent RL environment.
@@ -67,7 +71,7 @@ class FlockAviary(BaseMultiagentAviary):
                          record=record, 
                          obs=obs,
                          act=act
-                         )
+        )
 
     ################################################################################
     
@@ -85,10 +89,19 @@ class FlockAviary(BaseMultiagentAviary):
         rewards[0] = -1 * np.linalg.norm(np.array([0, 0, 1]) - states[0, 0:3])**2
         for i in range(1, self.NUM_DRONES):
             rewards[i] = -1 * np.linalg.norm(states[i-1, 2] - states[i, 2])**2
+
+        # log rewards into Wandb
+        # for drone_idx in range(0, self.NUM_DRONES-1):
+        #     wandb.run.log({"drone "+str(drone_idx): rewards[drone_idx]}, commit=False)
+        # wandb.run.log({"drone "+str(self.NUM_DRONES-1): rewards[self.NUM_DRONES-1]}, commit=True)
+
         return rewards
+
         """
         # obs here is dictionary of the form {"i":{"state": Box(20,), "neighbors": MultiBinary(NUM_DRONES)}}
         # parse velocity and position
+        obs = self._computeInfo()
+        
         vel = np.zeros((1, self.NUM_DRONES, 3)); pos = np.zeros((1, self.NUM_DRONES, 3))
         for i in range(self.NUM_DRONES):
             pos[0,i,:] = obs[   i   ]["state"][0:3]

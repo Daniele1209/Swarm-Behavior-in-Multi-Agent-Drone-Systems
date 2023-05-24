@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Multi-agent reinforcement learning experiments script')
-    parser.add_argument('--exp',    type=str,       help='The experiment folder written as ./results/save-<env>-<num_drones>-<algo>-<obs>-<act>-<time_date>', metavar='')
+    parser.add_argument('--exp', type=str, default='./results/save-flock-2-cc-kin-one_d_rpm-05.21.2023_22.39.17', help='The experiment folder written as ./results/save-<env>-<num_drones>-<algo>-<obs>-<act>-<time_date>', metavar='')
     ARGS = parser.parse_args()
 
     #### Parameters to recreate the environment ################
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     config = ppo.DEFAULT_CONFIG.copy() # For the default config, see github.com/ray-project/ray/blob/master/rllib/agents/trainer.py
     config = {
         "env": temp_env_name,
-        "num_workers": 0, #0+ARGS.workers,
+        "num_workers": 2, #0+ARGS.workers,
         "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "0")), # Use GPUs iff `RLLIB_NUM_GPUS` env var set to > 0
         "batch_mode": "complete_episodes",
         "callbacks": FillInActions,
